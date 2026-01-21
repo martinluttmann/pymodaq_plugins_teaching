@@ -47,12 +47,10 @@ class DAQ_Move_Monochromator(DAQ_Move_base):
     # the target value. It is the developer responsibility to put here a meaningful value
 
     def ini_attributes(self):
-        #  TODO declare the type of the wrapper (and assign it to self.controller) you're going to use for easy
-        #  autocompletion
+
         self.controller: Spectrometer = None
 
-        #TODO declare here attributes you want/need to init with a default value
-        pass
+
 
     def get_actuator_value(self):
         """Get the current value from the hardware with scaling conversion.
@@ -83,10 +81,9 @@ class DAQ_Move_Monochromator(DAQ_Move_base):
 
     def close(self):
         """Terminate the communication protocol"""
-        ## TODO for your custom plugin
-        raise NotImplementedError  # when writing your own plugin remove this line
+
         if self.is_master:
-            #  self.controller.your_method_to_terminate_the_communication()  # when writing your own plugin replace this line
+            self.controller.close_communication()  # when writing your own plugin replace this line
             ...
 
     def commit_settings(self, param: Parameter):
@@ -145,9 +142,8 @@ class DAQ_Move_Monochromator(DAQ_Move_base):
         value = self.check_bound(value)  #if user checked bounds, the defined bounds are applied here
         self.target_value = value
         value = self.set_position_with_scaling(value)  # apply scaling if the user specified one
-        ## TODO for your custom plugin
-        raise NotImplementedError  # when writing your own plugin remove this line
-        self.controller.your_method_to_set_an_absolute_value(value.value(self.axis_unit))  # when writing your own plugin replace this line
+
+        self.controller.set_wavelength(value.value(self.axis_unit))
         self.emit_status(ThreadCommand('Update_Status', ['Some info you want to log']))
 
     def move_rel(self, value: DataActuator):
@@ -161,17 +157,14 @@ class DAQ_Move_Monochromator(DAQ_Move_base):
         self.target_value = value + self.current_position
         value = self.set_position_relative_with_scaling(value)
 
-        ## TODO for your custom plugin
-        raise NotImplementedError  # when writing your own plugin remove this line
-        self.controller.your_method_to_set_a_relative_value(value.value(self.axis_unit))  # when writing your own plugin replace this line
+
+        self.controller.set_wavelength(value.value(self.axis_unit), set_type='rel')  # when writing your own plugin replace this line
         self.emit_status(ThreadCommand('Update_Status', ['Some info you want to log']))
 
     def move_home(self):
         """Call the reference method of the controller"""
 
-        ## TODO for your custom plugin
-        raise NotImplementedError  # when writing your own plugin remove this line
-        self.controller.your_method_to_get_to_a_known_reference()  # when writing your own plugin replace this line
+        self.controller.find_reference()  # when writing your own plugin replace this line
         self.emit_status(ThreadCommand('Update_Status', ['Some info you want to log']))
 
     def stop_motion(self):
